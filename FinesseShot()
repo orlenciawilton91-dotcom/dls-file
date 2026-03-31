@@ -1,0 +1,52 @@
+using UnityEngine;
+
+public class FinesseShot : MonoBehaviour
+{
+    public Rigidbody ballRb;
+
+    [Header("Stats")]
+    public float basePower = 20f;
+    public float finessePowerMultiplier = 0.7f;
+    public float curveStrength = 5f;
+    public float accuracy = 0.9f;
+
+    [Header("Spin Settings")]
+    public float spinForce = 10f;
+    public float spinDecay = 0.95f;
+
+    private Vector3 currentSpin;
+
+    public void Shoot(Vector3 target, bool isFinesse)
+    {
+        Vector3 direction = (target - ballRb.position).normalized;
+
+        float power = basePower;
+
+        if (isFinesse)
+        {
+            power *= finessePowerMultiplier;
+
+            // Perpendicular curve direction (Y-axis for ground shots)
+            Vector3 curveDir = Vector3.Cross(direction, Vector3.up).normalized;
+
+            direction += curveDir * curveStrength;
+
+            // Accuracy adjustment
+            direction += Random.insideUnitSphere * (1f - accuracy);
+
+            // Store spin
+            currentSpin = curveDir * spinForce;
+        }
+
+        ballRb.velocity = direction.normalized * power;
+    }
+
+    private void FixedUpdate()
+    {
+        // Apply spin over time
+        if (currentSpin.magnitude > 0.01f)
+        {
+            ballRb.velocity += currentSpin * Time.fixedDeltaTime;
+            currentSpin *= spinDecay;
+        }
+    }
