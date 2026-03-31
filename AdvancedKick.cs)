@@ -1,0 +1,51 @@
+using UnityEngine;
+
+public class AdvancedKick : MonoBehaviour
+{
+    public float maxKickForce = 20f;
+    public float chargeSpeed = 10f;
+
+    private float currentPower = 0f;
+    private bool isCharging = false;
+
+    void Update()
+    {
+        // Start charging
+        if (Input.GetKeyDown(KeyCode.Space))
+        {
+            isCharging = true;
+            currentPower = 0f;
+        }
+
+        // Keep charging
+        if (isCharging)
+        {
+            currentPower += chargeSpeed * Time.deltaTime;
+            currentPower = Mathf.Clamp(currentPower, 0, maxKickForce);
+        }
+
+        // Release shot
+        if (Input.GetKeyUp(KeyCode.Space))
+        {
+            Shoot();
+            isCharging = false;
+        }
+    }
+
+    void Shoot()
+    {
+        RaycastHit hit;
+
+        // Detect ball in front
+        if (Physics.Raycast(transform.position, transform.forward, out hit, 2f))
+        {
+            if (hit.collider.CompareTag("Ball"))
+            {
+                Rigidbody rb = hit.collider.GetComponent<Rigidbody>();
+
+                Vector3 shootDir = transform.forward;
+                rb.AddForce(shootDir * currentPower, ForceMode.Impulse);
+            }
+        }
+    }
+}
