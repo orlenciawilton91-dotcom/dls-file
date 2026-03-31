@@ -1,0 +1,21 @@
+void Shoot()
+{
+    RaycastHit hit;
+
+    if (Physics.Raycast(transform.position, transform.forward, out hit, 2f))
+    {
+        if (hit.collider.CompareTag("Ball"))
+        {
+            Rigidbody rb = hit.collider.GetComponent<Rigidbody>();
+
+            Vector3 shootDir = transform.forward;
+
+            // Curve based on horizontal input
+            float curve = Input.GetAxis("Horizontal");
+
+            Vector3 curveForce = transform.right * curve * currentPower * 0.5f;
+
+            rb.AddForce((shootDir * currentPower) + curveForce, ForceMode.Impulse);
+        }
+    }
+}
