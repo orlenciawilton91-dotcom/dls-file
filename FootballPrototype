@@ -1,0 +1,25 @@
+using UnityEngine;
+
+public class PlayerController : MonoBehaviour
+{
+    public float moveSpeed = 5f;
+    public float rotationSpeed = 10f;
+
+    void Update()
+    {
+        float h = Input.GetAxis("Horizontal");
+        float v = Input.GetAxis("Vertical");
+
+        Vector3 move = new Vector3(h, 0, v);
+
+        if (move.magnitude > 0.1f)
+        {
+            // Move player
+            transform.Translate(move * moveSpeed * Time.deltaTime, Space.World);
+
+            // Rotate player toward movement
+            Quaternion toRotation = Quaternion.LookRotation(move);
+            transform.rotation = Quaternion.Lerp(transform.rotation, toRotation, rotationSpeed * Time.deltaTime);
+        }
+    }
+}
